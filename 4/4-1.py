@@ -1,6 +1,6 @@
-draw = [7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1]
+testdraw = [7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1]
 
-boards = [
+testboards = [
 [[22,13,17,11,0],
 [8,2,23,4,24],
 [21,9,14,16,7],
@@ -20,10 +20,29 @@ boards = [
 [2,0,12,3,7]]
 ]
 
-initBoard = [[0 for _ in range(5)] for _ in range(5)]
+# initBoard = [[0 for _ in range(5)] for _ in range(5)]
+draws = []
+boards = []
+
+with open('input4.txt', 'r') as fd:
+    draws = [int(num) for num in fd.readline().split(',')]
+    newboard= []
+    for row in fd:
+        if row == '\n':
+            if len(newboard):
+                boards.append(newboard)
+            newboard= []
+        else:
+            newboard.append([int(num.strip()) for num in row.split(' ') if num.strip()])
+
+
+
+
+print(draws, boards)
+
+
 
 def checkBoard(num, board, boardState):
-    print(num, board, boardState)
     for rowIndex, row in enumerate(board):
         if num in row:
             index = row.index(num)
@@ -33,42 +52,67 @@ def checkBoard(num, board, boardState):
 
 
 
-def is_solved(board):
-    for i in range(0,5):
-        if board[i][0] == board[i][1] == board[i][2] != 0:
-            return board[i][0]
-        elif board[0][i] == board[1][i] == board[2][i] != 0:
-            return board[0][i]
+def isBingo(board):
+    for row in board:
+        if sum(row) == 5:
+            return True
 
-    if board[0][0] == board[1][1] == board[2][2] != 0:
-        return board[0][0]
-    elif board[0][2] == board[1][1] == board[2][0] != 0:
-        return board[0][0]
+    for col in range(5):
+        colSum = 0
+        for row in board:
+            colSum += row[col]
+            if(colSum) ==5:
+                return True
 
-    elif 0 not in board[0] and 0 not in board[1] and 0 not in board[2]:
-        return 0
-    else:
-        return -1
-
-
-
-
+    diag1 = 0
+    diag2 = 0
+    for rowIdx in range(5):
+        for colIdx in range(5):
+            if rowIdx == colIdx:
+                diag1 +=board[rowIdx][colIdx]
+                if diag1 ==5:
+                    return True
+            if rowIdx + colIdx ==4 :
+                diag2 +=board[rowIdx][colIdx]
+                if diag2 ==5:
+                    return True
+    return False
 
 
 def mainLoop():
-    # boardsState = [initBoard for _ in range(len(boards))]
-    currentStates = [initBoard for _ in range(len(boards))]
-    for boardIdx, board in enumerate(boards):
-        drawsToBingo = 0
-        for num in draw:
-            updatedBoardState = checkBoard(num, board, currentStates[boardIdx])
-            currentStates[boardIdx] = updatedBoardState
-            #TODO: check board state to see if it has hit bingo
-            drawsToBingo +=1
+    # currentStates = [initBoard for _ in range(len(boards))]
+    # drawsToBingo = [0 for _ in range(len(boards))]
+    # print(drawsToBingo)
+    # for boardIdx, board in enumerate(boards):
+    #     print('????', boardIdx)
+    #     for num in draw:
+    #         if not isBingo(currentStates[boardIdx]):
+    #             updatedBoardState = checkBoard(num, board, currentStates[boardIdx])
+    #             # print(currentStates, boardIdx, currentStates[boardIdx])
+    #             currentStates[boardIdx] = updatedBoardState
+    #             # print(drawsToBingo[boardIdx])
+    #             drawsToBingo[boardIdx] += 1
 
+    winningState = []
+    drawsToBingo = []
 
-        print(drawsToBingo)
+    for board in boards:
+        counter = 0
+        boardState = [[0 for _ in range(5)] for _ in range(5)]
+        print(boardState)
+        for num in draws:
+            if isBingo(boardState):
+                winningState.append(boardState)
+                drawsToBingo.append(counter)
+                break
+            else:
+                boardState = checkBoard(num, board, boardState)
+                # print(boardState)
+                # print(currentStates, boardIdx, currentStates[boardIdx])
+                # print(drawsToBingo[boardIdx])
+                counter += 1
 
+    print(drawsToBingo)
 
 
 mainLoop()

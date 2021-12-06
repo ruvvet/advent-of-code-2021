@@ -93,7 +93,7 @@ def getMatchingVal( i, temp):
         getMatchingVal(i+1, matchingVal)
 
 
-print(getMatchingVal( 0, [*test]))
+print(getMatchingVal( 0, test))
 
 
 
